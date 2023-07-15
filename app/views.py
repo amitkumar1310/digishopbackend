@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.http import JsonResponse
 from app.models import *
-# from .product import products
 
 from django.core.exceptions import RequestDataTooBig
 from datetime import datetime
@@ -14,23 +13,31 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-# Create your views here.
+
 from rest_framework import status
 from rest_framework.serializers import Serializer
 from django.contrib.auth.hashers import make_password
 from .serializer import ProductSerializer,UserSerializer,UserSerializerWithToken,OrderSerializer
 
-# from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-# from dj_rest_auth.registration.views import SocialLoginView
 
 # Create your views here.
 @api_view(['GET'])
 def getRoutes(request):
     return Response('Hello')
 
-# class GoogleLogin(SocialLoginView):
-#     permission_classes=(permissions.AllowAny,)
-#     adapter_class=GoogleOAuth2Adapter
+
+@api_view(['GET'])
+def getRoutes(request):
+    routes =[
+        '/api/products/',
+        '/api/products/<id>',
+        '/api/users',
+        '/api/users/register',
+        '/api/users/login',
+        '/api/users/profile',
+    ]
+    return Response(routes)      
+
 
 
 @api_view(['GET'])
@@ -44,7 +51,20 @@ def getProduct(request,pk):
     product=Product.objects.get(_id=pk)
     serializer=ProductSerializer(product,many=False)
     return Response(serializer.data)
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
+    def validate(self,attrs):
+        data=super().validate(attrs)
+        serializer = UserSerializerWithToken(self.user).data
+        for k,v in serializer.items():
+            data[k]=v
+    
+
+        return data
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class=MyTokenObtainPairSerializer
+    
 @api_view(['GET'])
 def pricerange(request):
     min_price = request.GET.get('min_price')
@@ -119,33 +139,6 @@ def electronics(request):
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 
-
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-
-    def validate(self,attrs):
-        data=super().validate(attrs)
-        serializer = UserSerializerWithToken(self.user).data
-        for k,v in serializer.items():
-            data[k]=v
-    
-
-        return data
-
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class=MyTokenObtainPairSerializer
-    
-    # SHOP API
-@api_view(['GET'])
-def getRoutes(request):
-    routes =[
-        '/api/products/',
-        '/api/products/<id>',
-        '/api/users',
-        '/api/users/register',
-        '/api/users/login',
-        '/api/users/profile',
-    ]
-    return Response(routes)      
 
 
 
