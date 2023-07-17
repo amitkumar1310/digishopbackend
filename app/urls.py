@@ -30,7 +30,7 @@ urlpatterns = [
     
     path('products/create/',views.createProduct,name="create_product"),
     path('products/upload/',views.uploadImage,name="upload_image"),
-    path('products/<str:pk>/reviews/',views.createProductReview,name="create-review"),
+    # path('products/<str:pk>/reviews/',views.createProductReview,name="create-review"),
     path('products/top/',views.getTopProducts,name="top-products"),
     path('products/update/<str:pk>/',views.updateProduct,name="update_product"),
     path('products/delete/<str:pk>/',views.deleteProduct,name="delete_product"),
